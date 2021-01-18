@@ -1,40 +1,24 @@
-/**
- * Fetches data from the API specified in the function and parses it to JSON,
- * as well as throwing an error message if something went wrong
- */
-    fetch('https://randomuser.me/api/?results=12')
-        .then( response => response.json())
-        .then( data => {
-            generateCards(data.results);
-            createModalWindow(data.results);
-        })
-
-
-function generateCards(employees) {
+function generateCardsAndModalWindows(employees) {
     const gallery = document.getElementById('gallery');
+    const body = document.body;
+
     for (let i = 0; i < employees.length; i++) {
         const employee = employees[i];
         gallery.insertAdjacentHTML('beforeend', `
-        <div class="card card-${i}">
-            <div class="card-img-container">
-                <img class="card-img" src="${employee.picture.large}" alt="profile picture">
-            </div>
-            <div class="card-info-container">
-                <h3 id="name" class="card-name cap">${employee.name.first} ${employee.name.last}</h3>
-                <p class="card-text">${employee.email}</p>
-                <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
-            </div>
-        </div> 
-    `);
-    }
-}
+            <div class="crd-${i} card ">
+                <div class="card-img-container">
+                    <img class="card-img" src="${employee.picture.large}" alt="profile picture">
+                </div>
+                <div class="card-info-container">
+                    <h3 id="name" class="card-name cap">${employee.name.first} ${employee.name.last}</h3>
+                    <p class="card-text">${employee.email}</p>
+                    <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
+                </div>
+            </div> 
+        `);
 
-function createModalWindow( employees ) {
-    const body = document.body;
-    for (let i = 0; i < employees.length; i++) {
-        const employee = employees[i];
         body.insertAdjacentHTML('beforeend', `
-            <div class="modal-container modal-${i} hide">
+            <div class="mod-${i} modal-container hide">
                 <div class="modal">
                     <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
                     <div class="modal-info-container">
@@ -56,5 +40,31 @@ function createModalWindow( employees ) {
             </div>
         `);
         console.log(`modal-${i} made`);
+
+        const modal = document.querySelector(`.mod-${i}`);
+        const card = document.querySelector(`.crd-${i}`)
+        card.addEventListener('click', e => {
+            modal.classList.remove('hide');
+            modal.classList.remove('show');
+        });
     }
+    [...document.querySelectorAll('.modal-close-btn')].forEach( button => {
+        button.addEventListener('click', e => {
+            console.log(e.target.parentNode.parentNode);
+            const modalWindow = button.parentNode.parentNode;
+            modalWindow.classList.remove('show');
+            modalWindow.classList.add('hide');
+        })
+    });
 }
+
+/**
+ * Fetches data from the API specified in the function and parses it to JSON
+ */
+    fetch('https://randomuser.me/api/?results=12')
+        .then( response => response.json())
+        .then( data => {
+            generateCardsAndModalWindows(data.results);            
+        })
+
+        
