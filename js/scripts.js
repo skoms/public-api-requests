@@ -27,33 +27,102 @@ function generateCardsAndModalWindows(employees) {
                         <p class="modal-text">${employee.email}</p>
                         <p class="modal-text cap">${employee.location.city}</p>
                         <hr>
-                        <p class="modal-text">${employee.cell}</p>
+                        <p class="modal-text">${formatCellNumber(employee.cell)}</p>
                         <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
-                        <p class="modal-text">Birthday: ${employee.dob.date}</p>
+                        <p class="modal-text">Birthday: ${formatDateOfBirth(employee.dob.date)}</p>
                     </div>
                 </div>
 
                 <div class="modal-btn-container">
-                    <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
-                    <button type="button" id="modal-next" class="modal-next btn">Next</button>
                 </div>
             </div>
         `);
-        console.log(`modal-${i} made`);
-
+        
         const modal = document.querySelector(`.mod-${i}`);
-        const card = document.querySelector(`.crd-${i}`)
+        const card = document.querySelector(`.crd-${i}`);
+        const modalBtnContainer = modal.querySelector('.modal-btn-container');
+        
+        if( i !== 0 ) {
+            modalBtnContainer.insertAdjacentHTML('beforeend', `
+                <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
+            `);
+        } else {
+            modalBtnContainer.insertAdjacentHTML('beforeend', `
+                <button type="button" id="modal-prev" class="modal-prev btn" style="display: none;">Prev</button>
+            `);
+        }
+        if( i !== 11 ) {
+            modalBtnContainer.insertAdjacentHTML('beforeend', `
+                <button type="button" id="modal-next" class="modal-next btn">Next</button>
+            `);
+        } else {
+            modalBtnContainer.insertAdjacentHTML('beforeend', `
+                <button type="button" id="modal-next" class="modal-next btn" style="display: none;">Next</button>
+            `);
+        }
+
         card.addEventListener('click', e => {
             modal.classList.remove('hide');
             modal.classList.remove('show');
         });
     }
-    [...document.querySelectorAll('.modal-close-btn')].forEach( button => {
-        button.addEventListener('click', e => {
+}
+// Credits go to editor Prashant Yadav, on 'https://learnersbucket.com/examples/javascript/how-to-format-phone-number-in-javascript/'.
+function formatCellNumber( numStr ) {
+    const numBase = numStr.replace(/\D/g, '');
+    const match = numBase.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+        return '(' + match[1] + ') ' + match[2] + '-' + match[3]
+    };
+    return numBase;
+}
+
+function formatDateOfBirth( numStr ) {
+    const numBase = numStr.replace(/\D/g, '');
+    const match = numBase.match(/^(\d{4})(\d{2})(\d{2})/);
+    if (match) {
+        return  match[2] + ' / ' + match[3] + ' / ' + match[1]
+    };
+    return null;
+}
+
+function addModalWindowEventHandlers() {
+    [...document.querySelectorAll('.modal-close-btn')].forEach( closeButton => {
+        closeButton.addEventListener('click', e => {
             console.log(e.target.parentNode.parentNode);
-            const modalWindow = button.parentNode.parentNode;
+            const modalWindow = closeButton.parentNode.parentNode;
             modalWindow.classList.remove('show');
             modalWindow.classList.add('hide');
+        })
+    });
+    [...document.querySelectorAll('.modal-prev')].forEach( prevButton => {
+        prevButton.addEventListener('click', e => {
+            const index = [...document.querySelectorAll('.modal-prev')].indexOf( prevButton );
+            console.log(e.target.parentNode.parentNode);
+            console.log(index);
+            if( index !== 0 ) {
+                const modalWindow = prevButton.parentNode.parentNode;
+                modalWindow.classList.remove('show');
+                modalWindow.classList.add('hide');
+                const prevModalWindow = document.querySelector(`.mod-${index - 1}`);
+                prevModalWindow.classList.remove('hide');
+                prevModalWindow.classList.add('show');
+            }
+        })
+    });
+    [...document.querySelectorAll('.modal-next')].forEach( nextButton => {
+        nextButton.addEventListener('click', e => {
+            const index = [...document.querySelectorAll('.modal-next')].indexOf( nextButton );
+            console.log(e.target.parentNode.parentNode);
+            console.log(index);
+            if( index !== 11 ) {
+                const modalWindow = nextButton.parentNode.parentNode;
+                modalWindow.classList.remove('show');
+                modalWindow.classList.add('hide');
+                const prevModalWindow = document.querySelector(`.mod-${index + 1}`);
+                prevModalWindow.classList.remove('hide');
+                prevModalWindow.classList.add('show');
+            }
         })
     });
 }
@@ -63,8 +132,6 @@ function generateCardsAndModalWindows(employees) {
  */
     fetch('https://randomuser.me/api/?results=12')
         .then( response => response.json())
-        .then( data => {
-            generateCardsAndModalWindows(data.results);            
-        })
+        .then( data => generateCardsAndModalWindows(data.results))
+        .then( addModalWindowEventHandlers )
 
-        
