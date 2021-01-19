@@ -1,3 +1,7 @@
+/**
+ * Creates and displays employee cards dynamically, as well as modal windows, which are initialized as hidden. Also adds listener on the card, to open the associated modal window
+ * @param {Array} employees - an array of 'employee' objects retrieved through remote API
+ */
 function generateCardsAndModalWindows(employees) {
     const gallery = document.getElementById('gallery');
     const body = document.body;
@@ -60,13 +64,31 @@ function generateCardsAndModalWindows(employees) {
                 <button type="button" id="modal-next" class="modal-next btn" style="display: none;">Next</button>
             `);
         }
-
+        
         card.addEventListener('click', e => {
             modal.classList.remove('hide');
             modal.classList.remove('show');
         });
     }
 }
+/**
+ * Dynamically creates and adds search-bar
+ */
+function createSearchBar() {
+    const searchContainer = document.querySelector('.search-container');
+    searchContainer.insertAdjacentHTML('beforeend', `
+        <form action="#" method="get">
+            <input type="search" id="search-input" class="search-input"  placeholder="&#128270;  Search...">
+        </form>
+    `);
+}
+/**
+ * Formats the cellnumber to match American format
+ * @param {string} numStr - cellphone number
+ * @returns {string} - Formatted cellnumber
+ * OR
+ * @returns {string} numbase - unformatted clean number(only if the number is not 10 characters long)
+ */
 // Credits go to editor Prashant Yadav, on 'https://learnersbucket.com/examples/javascript/how-to-format-phone-number-in-javascript/'.
 function formatCellNumber( numStr ) {
     const numBase = numStr.replace(/\D/g, '');
@@ -76,16 +98,24 @@ function formatCellNumber( numStr ) {
     };
     return numBase;
 }
-
-function formatDateOfBirth( numStr ) {
-    const numBase = numStr.replace(/\D/g, '');
+/**
+ * Formats the date of birth to match American format
+ * @param {string} dob - date of birth
+ * @returns {string} - Formatted date of birth
+ * OR
+ * @returns {null} - returns null if the provided argument is invalid
+ */
+function formatDateOfBirth( dob ) {
+    const numBase = dob.replace(/\D/g, '');
     const match = numBase.match(/^(\d{4})(\d{2})(\d{2})/);
     if (match) {
         return  match[2] + ' / ' + match[3] + ' / ' + match[1]
     };
     return null;
 }
-
+/**
+ * Adds event listeners to all modal windows for 'close', 'next' and 'prev' buttons
+ */
 function addModalWindowEventHandlers() {
     [...document.querySelectorAll('.modal-close-btn')].forEach( closeButton => {
         closeButton.addEventListener('click', e => {
@@ -127,15 +157,6 @@ function addModalWindowEventHandlers() {
     });
 }
 
-function createSearchBar() {
-    const searchContainer = document.querySelector('.search-container');
-    searchContainer.insertAdjacentHTML('beforeend', `
-        <form action="#" method="get">
-            <input type="search" id="search-input" class="search-input"  placeholder="&#128270;  Search...">
-        </form>
-    `);
-}
-
 function addSearchEventHandlers() {
     const employeeNames = [...document.querySelectorAll('.card-name')];
     const searchInput = document.getElementById('search-input');
@@ -156,9 +177,8 @@ function addSearchEventHandlers() {
         });
     });
 }
-
 /**
- * Fetches data from the API specified in the function and parses it to JSON
+ * Fetches data from the API specified in the function and parses it to JSON, and then calls all the required functions to get the page up and running.
  */
     fetch('https://randomuser.me/api/?results=12&nat=us')
         .then( response => response.json())
