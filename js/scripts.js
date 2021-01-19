@@ -41,7 +41,7 @@ function generateCardsAndModalWindows(employees) {
         const modal = document.querySelector(`.mod-${i}`);
         const card = document.querySelector(`.crd-${i}`);
         const modalBtnContainer = modal.querySelector('.modal-btn-container');
-        
+
         if( i !== 0 ) {
             modalBtnContainer.insertAdjacentHTML('beforeend', `
                 <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
@@ -127,11 +127,43 @@ function addModalWindowEventHandlers() {
     });
 }
 
+function createSearchBar() {
+    const searchContainer = document.querySelector('.search-container');
+    searchContainer.insertAdjacentHTML('beforeend', `
+        <form action="#" method="get">
+            <input type="search" id="search-input" class="search-input"  placeholder="&#128270;  Search...">
+        </form>
+    `);
+}
+
+function addSearchEventHandlers() {
+    const employeeNames = [...document.querySelectorAll('.card-name')];
+    const searchInput = document.getElementById('search-input');
+    const searchSubmitBtn = document.getElementById('search-submit');
+
+    searchInput.addEventListener('keyup', e => {
+        const matches = employeeNames.filter( employeeName => employeeName.textContent.toLowerCase().includes(searchInput.value.toLowerCase()));
+        console.log(matches);
+        employeeNames.forEach( employeeName => {
+            const card = employeeName.parentNode.parentNode;
+            card.classList.remove('show');
+            card.classList.add('hide');
+        });
+        matches.forEach( match => {
+            const card = match.parentNode.parentNode;
+            card.classList.remove('hide');
+            card.classList.add('show');
+        });
+    });
+}
+
 /**
  * Fetches data from the API specified in the function and parses it to JSON
  */
-    fetch('https://randomuser.me/api/?results=12')
+    fetch('https://randomuser.me/api/?results=12&nat=us')
         .then( response => response.json())
         .then( data => generateCardsAndModalWindows(data.results))
         .then( addModalWindowEventHandlers )
+        .then( createSearchBar )
+        .then( addSearchEventHandlers )
 
