@@ -67,7 +67,7 @@ function generateCardsAndModalWindows(employees) {
         
         card.addEventListener('click', e => {
             modal.classList.remove('hide');
-            modal.classList.remove('show');
+            modal.classList.add('show');
         });
     }
 }
@@ -174,6 +174,7 @@ function addSearchEventHandlers() {
             const card = match.parentNode.parentNode;
             card.classList.remove('hide');
             card.classList.add('show');
+            card.classList.remove('show'); // Removing the class again so not to override other classes styling
         });
     });
 }
